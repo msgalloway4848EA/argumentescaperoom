@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gilded Vault - Argument Escape Room</title>
+    
+    <!-- React and Babel from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        @keyframes artDecoFade {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .art-deco-border {
+            border: 3px solid #d4af37;
+            border-image: linear-gradient(45deg, #d4af37, #f4e4c1, #d4af37) 1;
+            box-shadow: 
+                0 0 30px rgba(212, 175, 55, 0.3),
+                inset 0 0 30px rgba(212, 175, 55, 0.1);
+        }
+        
+        .gold-text {
+            background: linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+        
+        .art-deco-accent {
+            animation: artDecoFade 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const ArgEscapeRoom = () => {
+            const [currentPuzzle, setCurrentPuzzle] = useState(0);
+            const [puzzle1Answer, setPuzzle1Answer] = useState('');
+            const [puzzle2Answers, setPuzzle2Answers] = useState({});
+            const [puzzle3Selection, setPuzzle3Selection] = useState('');
+            const [puzzle4Order, setPuzzle4Order] = useState([]);
+            const [puzzle5Selection, setPuzzle5Selection] = useState({
+                position: '',
+                reasoning: '',
+                sophistication: ''
+            });
+            const [showHint, setShowHint] = useState(false);
+            const [showError, setShowError] = useState(false);
+            const [errorMessage, setErrorMessage] = useState('');
+
+            const checkPuzzle1 = () => {
+                if (puzzle1Answer.toLowerCase().trim() === 'claim') {
+                    setCurrentPuzzle(1);
+                    setShowError(false);
+                } else {
+                    setErrorMessage('Not quite. This is the statement that the author is trying to prove or argue.');
+                    setShowError(true);
+                }
+            };
+
+            const checkPuzzle2 = () => {
+                const correct = {
+                    A: 'claim',
+                    B: 'evidence',
+                    C: 'reasoning',
+                    D: 'claim'
+                };
+                
+                const allCorrect = Object.keys(correct).every(
+                    key => puzzle2Answers[key]?.toLowerCase() === correct[key]
+                );
+
+                if (allCorrect && Object.keys(puzzle2Answers).length === 4) {
+                    setCurrentPuzzle(2);
+                    setShowError(false);
+                } else {
+                    setErrorMessage('Some pieces are in the wrong place. Remember: Claim = what you argue, Evidence = facts/data, Reasoning = explains how evidence supports the claim.');
+                    setShowError(true);
+                }
+            };
+
+            const checkPuzzle3 = () => {
+                if (puzzle3Selection === 'B') {
+                    setCurrentPuzzle(3);
+                    setShowError(false);
+                } else {
+                    setErrorMessage('Look for the statement that takes a clear position and is debatable, not just a fact or question.');
+                    setShowError(true);
+                }
+            };
+
+            const checkPuzzle4 = () => {
+                const correctOrder = ['introduce', 'evidence', 'reasoning', 'counterclaim', 'rebuttal', 'conclusion'];
+                const isCorrect = JSON.stringify(puzzle4Order) === JSON.stringify(correctOrder);
+
+                if (isCorrect) {
+                    setCurrentPuzzle(4);
+                    setShowError(false);
+                } else {
+                    setErrorMessage('The sequence isn\'t quite right. Think about the logical flow: start with your position, support it, address opposition, then wrap up.');
+                    setShowError(true);
+                }
+            };
+
+            const checkPuzzle5 = () => {
+                if (
+                    puzzle5Selection.position === 'B' &&
+                    puzzle5Selection.reasoning === 'E' &&
+                    puzzle5Selection.sophistication === 'H'
+                ) {
+                    alert('🎉 CONGRATULATIONS! 🎉\n\nYou\'ve escaped The Gilded Vault!\n\nYou\'ve proven you understand:\n✓ What makes a strong claim\n✓ How to support claims with evidence\n✓ The importance of reasoning\n✓ How to structure an argument\n✓ The elements of sophisticated argumentation\n\nYou are now a master of argumentation!');
+                    setShowError(false);
+                } else {
+                    let feedback = 'Not quite the strongest thesis. ';
+                    if (puzzle5Selection.position !== 'B') {
+                        feedback += 'Your position should be clear and specific. ';
+                    }
+                    if (puzzle5Selection.reasoning !== 'E') {
+                        feedback += 'Your reasoning should thoroughly explain WHY. ';
+                    }
+                    if (puzzle5Selection.sophistication !== 'H') {
+                        feedback += 'Consider how to acknowledge complexity without weakening your argument.';
+                    }
+                    setErrorMessage(feedback);
+                    setShowError(true);
+                }
+            };
+
+            const puzzleTitles = [
+                "The Foundation Stone",
+                "The Architect's Blueprint",
+                "The Master's Choice",
+                "The Grand Design",
+                "The Final Lock"
+            ];
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-gray-900 via-amber-950 to-gray-900 text-amber-100">
+                    {/* Art Deco Header */}
+                    <div className="art-deco-border bg-black/60 backdrop-blur-sm p-8 mb-8">
+                        <div className="max-w-6xl mx-auto">
+                            <h1 className="text-5xl md:text-7xl font-bold text-center mb-4 gold-text" style={{ fontFamily: '"Cinzel", serif' }}>
+                                THE GILDED VAULT
+                            </h1>
+                            <p className="text-center text-amber-300/80 text-xl italic" style={{ fontFamily: '"Libre Baskerville", serif' }}>
+                                An Argument Escape Room
+                            </p>
+                            <div className="flex justify-center gap-2 mt-6">
+                                {[0, 1, 2, 3, 4].map((i) => (
+                                    <div
+                                        key={i}
+                                        className={`w-12 h-2 transition-all ${
+                                            i <= currentPuzzle 
+                                                ? 'bg-amber-500 art-deco-accent' 
+                                                : 'bg-amber-900/30'
+                                        }`}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="max-w-4xl mx-auto px-4 pb-12">
+                        {/* Welcome Screen */}
+                        {currentPuzzle === 0 && (
+                            <div className="fade-in-up">
+                                <div className="art-deco-border bg-black/40 backdrop-blur-sm p-8 mb-8">
+                                    <h2 className="text-3xl font-bold mb-6 gold-text text-center" style={{ fontFamily: '"Cinzel", serif' }}>
+                                        Welcome, Initiate
+                                    </h2>
+                                    <div className="space-y-4 text-amber-100/90" style={{ fontFamily: '"Libre Baskerville", serif' }}>
+                                        <p className="text-lg leading-relaxed">
+                                            You stand before <span className="gold-text font-bold">The Gilded Vault</span>, a legendary chamber 
+                                            said to hold the secrets of persuasive argumentation. Within these walls lie five challenges, 
+                                            each designed to test your mastery of argumentative writing.
+                                        </p>
+                                        <p className="text-lg leading-relaxed">
+                                            Only those who truly understand the art of <span className="text-amber-400 font-semibold">claim</span>, 
+                                            {' '}<span className="text-amber-400 font-semibold">evidence</span>, and 
+                                            {' '}<span className="text-amber-400 font-semibold">reasoning</span> may proceed.
+                                        </p>
+                                        <p className="text-lg leading-relaxed italic text-amber-300">
+                                            Will you unlock the vault's treasures, or will its mysteries remain forever sealed?
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Puzzle 1: Foundation Stone */}
+                                <div className="art-deco-border bg-black/40 backdrop-blur-sm p-8">
+                                    <h3 className="text-2xl font-bold mb-4 gold-text" style={{ fontFamily: '"Cinzel", serif' }}>
+                                        Puzzle 1: The Foundation Stone
+                                    </h3>
+                                    <p className="mb-6 text-amber-100/80" style={{ fontFamily: '"Libre Baskerville", serif' }}>
+                                        Before the vault door, you find an inscription and an empty pedestal. 
+                                        To proceed, you must identify the cornerstone of all arguments.
+                                    </p>
+                                    
+                                    <div className="bg-amber-950/30 border-2 border-amber-600/50 p-6 mb-6">
+                                        <p className="text-amber-200 italic mb-4" style={{ fontFamily: '"Libre Baskerville", serif' }}>
+                                            "I am the statement an author seeks to prove. I am debatable, not a simple fact. 
+                                            I am the purpose for which all evidence and reasoning exist. What am I?"
+                                        </p>
+                                    </div>
+
+                                    <input
+                                        type="text"
+                                        value={puzzle1Answer}
+                                        onChange={(e) => setPuzzle1Answer(e.target.value)}
+                                        placeholder="Enter your answer..."
+                                        className="w-full p-4 bg-black/60 border-2 border-amber-700 text-amber-100 placeholder-amber-700 focus:border-amber-500 focus:outline-none mb-4"
+                                        style={{ fontFamily: '"Libre Baskerville", serif' }}
+                                    />
+
+                                    {showError && (
+                                        <div className="mb-4 p-4 bg-red-900/30 border-2 border-red-600 text-red-200">
+                                            {errorMessage}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={checkPuzzle1}
+                                        className="w-full px-6 py-3 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 text-black font-bold tracking-wider hover:from-amber-600 hover:via-amber-500 hover:to-amber-600 transition-all border-2 border-amber-400"
+                                    >
+                                        UNLOCK
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Puzzle 2: Architect's Blueprint */}
+                        {currentPuzzle === 1 && (
+                            <div className="fade-in-up">
+                                <div className="art-deco-border bg-black/40 backdrop-blur-sm p-8">
+                                    <h3 className="text-2xl font-bold mb-4 gold-text" style={{ fontFamily: '"Cinzel", serif' }}>
+                                        Puzzle 2: The Architect's Blueprint
+                                    </h3>
+                                    <p className="mb-6 text-amber-100/80" style={{ fontFamily: '"Libre Baskerville", serif' }}>
+                                        The first door opens, revealing a chamber with scattered pieces of an argument. 
+                                        You must correctly label each component to proceed.
+                                    </p>
+
+                                    <div className="space-y-6">
+                                        {[
+                                            { 
+                                                id: 'A', 
+                                                text: "Schools should ban smartphones during class hours.",
+                                                hint: "This is what the writer wants you to believe"
+                                            },
+                                            { 
+                                                id: 'B', 
+                                                text: "A study by the London School of Economics found that schools that banned phones saw test scores improve by 6.4%.",
+                                                hint: "This is factual information from a source"
+                                            },
+                                            { 
+                                                id: 'C', 
+                                                text: "This data demonstrates that removing phone distractions directly correlates with better academic performance.",
+                                                hint: "This explains HOW the data supports the argument"
+                                            },
+                                            { 
+                                                id: 'D', 
+                                                text: "Therefore, implementing phone restrictions can improve student achievement.",
+                                                hint: "This restates the main argument"
+                                            }
+                                        ].map((item) => (
+                                            <div key={item.id} className="bg-amber-950/30 border-2 border-amber-600/50 p-4">
+                                                <p className="text-amber-100 mb-3" style={{ fontFamily: '"Libre Baskerville", serif' }}>
+                                                    <span className="font-bold text-amber-400">{item.id}.</span> {item.text}
+                                                </p>
+                                                <select
+                                                    value={puzzle2Answers[item.id] || ''}
+                                                    onChange={(e) => setPuzzle2Answers({...puzzle2Answers, [item.id]: e.target.value})}
+                                                    className="w-full p-2 bg-black/60 border border-amber-700 text-amber-100"
+                                                >
+                                                    <option value="">-- Select type --</option>
+                                                    <option value="claim">Claim</option>
+                                                    <option value="evidence">Evidence</option>
+                                                    <option value="reasoning">Reasoning</option>
+                                                </select>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {showError && (
+                                        <div className="mt-4 p-4 bg-red-900/30 border-2 border-red-600 text-red-200">
+                                            {errorMessage}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={checkPuzzle2}
+                                        className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 text-black font-bold tracking-wider hover:from-amber-600 hover:via-amber-500 hover:to-amber-600 transition-all border-2 border-amber-400"
+                                    >
+                                        PROCEED
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Puzzle 3: Master's Choice */}
+                        {currentPuzzle === 2 && (
+                            <div className="fade-in-up">
+                                <div className="art-deco-border bg-black/40 backdrop-blur-sm p-8">
+                                    <h3 className="text-2xl font-bold mb-4 gold-text" style={{ fontFamily: '"Cinzel", serif' }}>
+                                        Puzzle 3: The Master's Choice
+                                    </h3>
+                                    <p className="mb-6 text-amber-100/80" style={{ fontFamily: '"Libre Baskerville", serif' }}>
+                                        Before you lie three statements. Only one is a true argumentative claim. 
+                                        Choose wisely—the vault's defenses will not tolerate error.
+                                    </p>
+
+                                    <div className="space-y-4">
+                                        {[
+                                            { id: 'A', text: "Many students use smartphones in school.", type: "This is a FACT, not arguable" },
+                                            { id: 'B', text: "Schools should implement smartphone bans to improve student focus and academic performance.", type: "CLAIM" },
+                                            { id: 'C', text: "Should schools ban smartphones?", type: "This is a QUESTION, not a claim" }
+                                        ].map((option) => (
+                                            <button
+                                                key={option.id}
+                                                onClick={() => setPuzzle3Selection(option.id)}
+                                                className={`w-full p-6 text-left border-2 transition-all ${
+                                                    puzzle3Selection === option.id
+                                                        ? 'bg-amber-600/20 border-amber-500 text-amber-100'
+                                                        : 'bg-black/40 border-amber-900/30 text-amber-200/70 hover:border-amber-700'
+                                                }`}
+                                            >
+                                                <div className="text-xl font-bold text-amber-400 mb-2">{option.id}</div>
+                                                <div style={{ fontFamily: '"Libre Baskerville", serif' }}>{option.text}</div>
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {showError && (
+                                        <div className="mt-4 p-4 bg-red-900/30 border-2 border-red-600 text-red-200">
+                                            {errorMessage}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={checkPuzzle3}
+                                        className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 text-black font-bold tracking-wider hover:from-amber-600 hover:via-amber-500 hover:to-amber-600 transition-all border-2 border-amber-400"
+                                    >
+                                        CONFIRM CHOICE
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Puzzle 4: Grand Design */}
+                        {currentPuzzle === 3 && (
+                            <div className="fade-in-up">
+                                <div className="art-deco-border bg-black/40 backdrop-blur-sm p-8">
+                                    <h3 className="text-2xl font-bold mb-4 gold-text" style={{ fontFamily: '"Cinzel", serif' }}>
+                                        Puzzle 4: The Grand Design
+                                    </h3>
+                                    <p className="mb-6 text-amber-100/80" style={{ fontFamily: '"Libre Baskerville", serif' }}>
+                                        The vault's penultimate challenge: arrange the elements of a complete argument 
+                                        in their proper sequence. The architecture of persuasion demands precision.
+                                    </p>
+
+                                    <div className="mb-6 p-4 bg-amber-950/30 border-2 border-amber-600/50">
+                                        <p className="text-amber-300 text-sm italic">
+                                            Drag and drop to arrange in the correct order, or click to add in sequence:
+                                        </p>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                        {[
+                                            { id: 'introduce', text: "Introduce your claim/thesis" },
+                                            { id: 'evidence', text: "Present evidence" },
+                                            { id: 'reasoning', text: "Explain your reasoning" },
+                                            { id: 'counterclaim', text: "Address counterclaims" },
+                                            { id: 'rebuttal', text: "Provide rebuttal" },
+                                            { id: 'conclusion', text: "Conclude with final thoughts" }
+                                        ].filter(item => !puzzle4Order.includes(item.id)).map((item) => (
+                                            <button
+                                                key={item.id}
+                                                onClick={() => setPuzzle4Order([...puzzle4Order, item.id])}
+                                                className="p-4 bg-amber-900/30 border-2 border-amber-700 text-amber-200 hover:bg-amber-800/40 hover:border-amber-500 transition-all"
+                                            >
+                                                {item.text}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {puzzle4Order.length > 0 && (
+                                        <div className="mb-6">
+                                            <h4 className="text-amber-400 font-bold mb-3">Your Order:</h4>
+                                            <div className="space-y-2">
+                                                {puzzle4Order.map((id, index) => {
+                                                    const item = [
+                                                        { id: 'introduce', text: "Introduce your claim/thesis" },
+                                                        { id: 'evidence', text: "Present evidence" },
+                                                        { id: 'reasoning', text: "Explain your reasoning" },
+                                                        { id: 'counterclaim', text: "Address counterclaims" },
+                                                        { id: 'rebuttal', text: "Provide rebuttal" },
+                                                        { id: 'conclusion', text: "Conclude with final thoughts" }
+                                                    ].find(i => i.id === id);
+                                                    return (
+                                                        <div key={id} className="flex items-center gap-3 p-3 bg-amber-950/40 border border-amber-600/50">
+                                                            <span className="text-amber-400 font-bold">{index + 1}.</span>
+                                                            <span className="flex-1">{item.text}</span>
+                                                            <button
+                                                                onClick={() => setPuzzle4Order(puzzle4Order.filter(i => i !== id))}
+                                                                className="px-3 py-1 bg-red-900/50 border border-red-700 text-red-200 hover:bg-red-800/50"
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {showError && (
+                                        <div className="mb-4 p-4 bg-red-900/30 border-2 border-red-600 text-red-200">
+                                            {errorMessage}
+                                        </div>
+                                    )}
+
+                                    {puzzle4Order.length === 6 && (
+                                        <button
+                                            onClick={checkPuzzle4}
+                                            className="w-full px-6 py-3 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 text-black font-bold tracking-wider hover:from-amber-600 hover:via-amber-500 hover:to-amber-600 transition-all border-2 border-amber-400"
+                                        >
+                                            VERIFY SEQUENCE
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Puzzle 5: Final Lock */}
+                        {currentPuzzle === 4 && (
+                            <div className="fade-in-up">
+                                <div className="art-deco-border bg-black/40 backdrop-blur-sm p-8">
+                                    <h3 className="text-2xl font-bold mb-4 gold-text" style={{ fontFamily: '"Cinzel", serif' }}>
+                                        Puzzle 5: The Final Lock
+                                    </h3>
+                                    <p className="mb-6 text-amber-100/80" style={{ fontFamily: '"Libre Baskerville", serif' }}>
+                                        You stand before the vault's inner sanctum. To unlock it, you must craft 
+                                        the perfect thesis statement by selecting the strongest elements.
+                                    </p>
+
+                                    <div className="space-y-6">
+                                        {/* Position */}
+                                        <div>
+                                            <h4 className="text-amber-400 font-bold mb-3 text-lg">STEP 1: Choose Your Position</h4>
+                                            <div className="space-y-3">
+                                                {[
+                                                    { id: 'A', text: "Smartphones are a problem in schools" },
+                                                    { id: 'B', text: "Schools should implement a complete smartphone ban during all school hours, including lunch and breaks" },
+                                                    { id: 'C', text: "Some people think smartphones should be banned but others disagree" }
+                                                ].map(option => (
+                                                    <button
+                                                        key={option.id}
+                                                        onClick={() => setPuzzle5Selection({...puzzle5Selection, position: option.id})}
+                                                        className={`w-full p-4 text-left border transition-all ${
+                                                            puzzle5Selection.position === option.id
+                                                                ? 'bg-amber-600/20 border-amber-500 text-amber-100'
+                                                                : 'bg-black/40 border-amber-900/30 text-amber-200/70 hover:border-amber-700'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="text-amber-500 font-bold">{option.id}.</div>
+                                                            <div style={{ fontFamily: '"Libre Baskerville", serif', fontSize: '0.9rem' }}>
+                                                                {option.text}
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Reasoning */}
+                                        <div>
+                                            <h4 className="text-amber-400 font-bold mb-3 text-lg">STEP 2: Add Your Reasoning</h4>
+                                            <div className="space-y-3">
+                                                {[
+                                                    { id: 'D', text: "because everyone knows phones are distracting" },
+                                                    { id: 'E', text: "because constant access to social media during breaks prevents the mental rest students need for academic focus and healthy social development" },
+                                                    { id: 'F', text: "and that's just how it is" }
+                                                ].map(option => (
+                                                    <button
+                                                        key={option.id}
+                                                        onClick={() => setPuzzle5Selection({...puzzle5Selection, reasoning: option.id})}
+                                                        className={`w-full p-4 text-left border transition-all ${
+                                                            puzzle5Selection.reasoning === option.id
+                                                                ? 'bg-amber-600/20 border-amber-500 text-amber-100'
+                                                                : 'bg-black/40 border-amber-900/30 text-amber-200/70 hover:border-amber-700'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="text-amber-500 font-bold">{option.id}.</div>
+                                                            <div style={{ fontFamily: '"Libre Baskerville", serif', fontSize: '0.9rem' }}>
+                                                                {option.text}
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Sophistication */}
+                                        <div>
+                                            <h4 className="text-amber-400 font-bold mb-3 text-lg">STEP 3: Add Sophistication</h4>
+                                            <div className="space-y-3">
+                                                {[
+                                                    { id: 'G', text: "(No addition—end the thesis)" },
+                                                    { id: 'H', text: "though schools should provide secure phone storage and allow emergency parent communication through the main office." },
+                                                    { id: 'I', text: "and anyone who disagrees is wrong." }
+                                                ].map(option => (
+                                                    <button
+                                                        key={option.id}
+                                                        onClick={() => setPuzzle5Selection({...puzzle5Selection, sophistication: option.id})}
+                                                        className={`w-full p-4 text-left border transition-all ${
+                                                            puzzle5Selection.sophistication === option.id
+                                                                ? 'bg-amber-600/20 border-amber-500 text-amber-100'
+                                                                : 'bg-black/40 border-amber-900/30 text-amber-200/70 hover:border-amber-700'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="text-amber-500 font-bold">{option.id}.</div>
+                                                            <div style={{ fontFamily: '"Libre Baskerville", serif', fontSize: '0.9rem' }}>
+                                                                {option.text}
+                                                            </div>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {puzzle5Selection.position && puzzle5Selection.reasoning && puzzle5Selection.sophistication && (
+                                        <div className="mb-8 p-6 bg-amber-950/30 border-2 border-amber-600/50">
+                                            <div className="text-amber-400 mb-3 font-bold text-center">YOUR THESIS</div>
+                                            <div className="text-amber-100/90 text-lg text-center italic" style={{ fontFamily: '"Libre Baskerville", serif' }}>
+                                                {puzzle5Selection.position === 'A' && "Smartphones are a problem in schools"}
+                                                {puzzle5Selection.position === 'B' && "Schools should implement a complete smartphone ban during all school hours, including lunch and breaks"}
+                                                {puzzle5Selection.position === 'C' && "Some people think smartphones should be banned but others disagree"}
+                                                {puzzle5Selection.reasoning === 'D' && " because everyone knows phones are distracting"}
+                                                {puzzle5Selection.reasoning === 'E' && " because constant access to social media during breaks prevents the mental rest students need for academic focus and healthy social development"}
+                                                {puzzle5Selection.reasoning === 'F' && " and that's just how it is"}
+                                                {puzzle5Selection.sophistication === 'H' && ", though schools should provide secure phone storage and allow emergency parent communication through the main office"}
+                                                {puzzle5Selection.sophistication === 'I' && " and anyone who disagrees is wrong"}
+                                                .
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {showError && (
+                                        <div className="mb-4 p-4 bg-red-900/30 border-2 border-red-600 text-red-200">
+                                            {errorMessage}
+                                        </div>
+                                    )}
+
+                                    {puzzle5Selection.position && puzzle5Selection.reasoning && puzzle5Selection.sophistication && (
+                                        <div className="text-center">
+                                            <button
+                                                onClick={checkPuzzle5}
+                                                className="px-8 py-3 bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 text-black font-bold tracking-wider hover:from-amber-600 hover:via-amber-500 hover:to-amber-600 transition-all border-2 border-amber-400"
+                                            >
+                                                ESCAPE THE VAULT!
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ArgEscapeRoom />);
+    </script>
+</body>
+</html>
